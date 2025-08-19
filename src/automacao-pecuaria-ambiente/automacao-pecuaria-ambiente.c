@@ -17,8 +17,20 @@
  * - Conecta-se à rede Wi-Fi com lógica de reconexão automática.
  */
 
+// --- BIBLIOTECAS (INCLUDES) ---
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "pico/stdlib.h"
+#include "inc/ssd1306.h"
+#include "hardware/i2c.h"
+#include "hardware/clocks.h"
+#include "hardware/rtc.h"
+#include "pico/cyw43_arch.h"
+#include "lwip/pbuf.h"
+#include "lwip/tcp.h"
+#include "pico/util/datetime.h"
+#include "ws2818b.pio.h"
 
 
 
