@@ -61,6 +61,12 @@ const uint I2C_SCL = 15;
 #define MAX_HISTORICO 10
 const uint32_t SENSOR_READ_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
 
+// --- ESTRUTURAS E VARIÁVEIS GLOBAIS ---
+// Sensores (simulados)
+float temperatura_sensor = 25.0;
+float umidade_sensor = 50.0;
+float luminosidade_sensor = 50.0;
+
 
 int main()
 {
