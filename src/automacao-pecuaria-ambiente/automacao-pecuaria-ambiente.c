@@ -322,12 +322,91 @@ void verificar_wifi() {
     }
 }
 
-int main()
-{
+// --- FUNÇÃO PRINCIPAL (MAIN) ---
+int main() {
     stdio_init_all();
+    sleep_ms(3000); // Pausa para abrir o monitor serial
 
-    while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+    // Define data e hora iniciais (Ano, Mês, Dia, Dia da Semana, Hora, Minuto, Segundo)
+    datetime_t t = {.year = 2025, .month = 7, .day = 1, .dotw = 2, .hour = 22, .min = 43, .sec = 0};
+    rtc_init();
+    rtc_set_datetime(&t);
+
+    for (int i = 0; i < MAX_HISTORICO; i++) historico_valido[i] = false;
+
+    if (cyw43_arch_init()) {
+        printf("Erro ao iniciar o Wi-Fi\n");
+        return 1;
     }
+    cyw43_arch_enable_sta_mode();
+    cyw43_arch_wifi_connect_async(WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_AES_PSK);
+    printf("Wi-Fi: tentando conectar...\n");
+
+    // Inicializa os pinos dos relés como saída
+    gpio_init(RELAY_LIGHTS_PIN);
+    gpio_set_dir(RELAY_LIGHTS_PIN, GPIO_OUT);
+    gpio_init(RELAY_FAN_PIN);
+    gpio_set_dir(RELAY_FAN_PIN, GPIO_OUT);
+    gpio_init(RELAY_HUMIDIFIER_PIN);
+    gpio_set_dir(RELAY_HUMIDIFIER_PIN, GPIO_OUT);
+
+    // Inicializa I2C e Display OLED
+    i2c_init(i2c1, 400 * 1000);
+    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C_SDA);
+    gpio_pull_up(I2C_SCL);
+    ssd1306_init();
+    frame_area = (struct render_area){.start_column = 0, .end_column = SSD1306_WIDTH - 1, .start_page = 0, .end_page = (SSD1306_HEIGHT / 8) - 1};
+    calculate_render_area_buffer_length(&frame_area);
+    ssd1306_draw_string(oled_buffer, 0, 0, "Inicializando...");
+    render_on_display(oled_buffer, &frame_area);
+    printf("Display OLED inicializado.\n");
+
+    // Inicializa LEDs Neopixel
+    npInit(LED_PIN_PIO);
+    printf("Matriz de LEDs inicializada no pino %d.\n", LED_PIN_PIO);
+
+    srand(to_us_since_boot(get_absolute_time()));
+    start_http_server();
+
+    absolute_time_t last_sensor_read_time = get_absolute_time();
+    simular_temperatura_umidade_sensor();
+    simular_luminosidade_sensor();
+    salvar_historico_sensores();
+
+    // --- LOOP PRINCIPAL ---
+    while (true) {
+        cyw43_arch_poll();
+        verificar_wifi();
+
+        // Bloco de tempo para simular sensores e controlar os relés (a cada 30 segundos)
+        static absolute_time_t last_control_check = {0};
+        absolute_time_t now = get_absolute_time();
+        if (absolute_time_diff_us(last_control_check, now) > 30 * 1000 * 1000) {
+            last_control_check = now;
+            simular_luminosidade_sensor();
+            acionar_rele_luz(luminosidade_sensor < LUMINOSITY_THRESHOLD);
+
+            simular_temperatura_umidade_sensor();
+            acionar_rele_ventilador(temperatura_sensor);
+            acionar_rele_umidificador(umidade_sensor);
+        }
+
+        // Bloco de tempo para salvar os dados no histórico (a cada 5 minutos)
+        if (absolute_time_diff_us(last_sensor_read_time, now) > (int64_t)SENSOR_READ_INTERVAL_MS * 1000) {
+            last_sensor_read_time = now;
+            salvar_historico_sensores();
+        }
+
+        // Atualiza as interfaces visuais
+        atualizar_display_oled();
+        atualizar_matriz_leds();
+        npWrite();
+
+        sleep_ms(100); // Pequena pausa para reduzir o uso de CPU
+    }
+
+    cyw43_arch_deinit();
+    return 0;
 }
