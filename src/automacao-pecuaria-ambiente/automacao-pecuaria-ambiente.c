@@ -116,7 +116,11 @@ void npWrite() {
     sleep_us(100);
 }
 
-
+// Cores pré-definidas para os indicadores
+const pixel_t COR_DESLIGADO = {0, 0, 0};
+const pixel_t COR_LUZ = {30, 100, 0};       // Amarelo (G, R, B)
+const pixel_t COR_VENTILADOR = {50, 50, 50}; // Branco
+const pixel_t COR_UMIDIFICADOR = {50, 0, 50};  // Ciano/Azul
 
 
 int main()
