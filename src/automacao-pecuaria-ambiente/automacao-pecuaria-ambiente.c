@@ -67,6 +67,16 @@ float temperatura_sensor = 25.0;
 float umidade_sensor = 50.0;
 float luminosidade_sensor = 50.0;
 
+// Estrutura para o histórico
+typedef struct {
+    float temperatura;
+    float umidade;
+    datetime_t timestamp;
+} historico_t;
+
+historico_t historico_sensores[MAX_HISTORICO];
+bool historico_valido[MAX_HISTORICO];
+
 
 int main()
 {
