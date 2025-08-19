@@ -83,6 +83,17 @@ char csv_content[2048];
 uint8_t oled_buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 struct render_area frame_area;
 
+// Estruturas para LEDs Neopixel
+struct pixel_t {
+    uint8_t G, R, B;
+};
+typedef struct pixel_t pixel_t;
+typedef pixel_t npLED_t;
+
+npLED_t leds[LED_COUNT];
+PIO np_pio;
+uint sm;
+
 
 
 
