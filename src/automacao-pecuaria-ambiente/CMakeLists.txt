@@ -40,6 +40,9 @@ add_executable(automacao-pecuaria-ambiente automacao-pecuaria-ambiente.c inc/ssd
 pico_set_program_name(automacao-pecuaria-ambiente "automacao-pecuaria-ambiente")
 pico_set_program_version(automacao-pecuaria-ambiente "0.1")
 
+# Generate PIO header
+pico_generate_pio_header(EmbarcaTech ${CMAKE_CURRENT_LIST_DIR}/ws2818b.pio)
+
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(automacao-pecuaria-ambiente 0)
 pico_enable_stdio_usb(automacao-pecuaria-ambiente 0)
