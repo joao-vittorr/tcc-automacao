@@ -79,7 +79,7 @@ O projeto está organizado da seguinte forma:
 A pesquisa de campo com produtores da região validou a percepção sobre os impactos negativos do calor e o grande interesse em uma solução tecnológica acessível. A maioria indicou uma disposição para investir até R$ 500,00, o que valida a viabilidade econômica do protótipo, cujo custo foi de **R$ 283,00**. Os resultados demonstram a viabilidade técnica e econômica da solução, que se apresenta como uma ferramenta prática para mitigar o estresse térmico, promover o bem-estar animal e fortalecer a pecuária leiteira familiar na região.
 
 ## ⚙️ Configuração do Ambiente
-Para configurar o ambiente e rodar os códigos do Raspberry Pi Pico W, siga este [guia detalhado](docs/ambiente/getting-started.md).
+Para configurar o ambiente e rodar os códigos do Raspberry Pi Pico W, siga este [guia detalhado](docs/setup/getting-started.md).
 
 ## 👨‍💻 Autor
 
