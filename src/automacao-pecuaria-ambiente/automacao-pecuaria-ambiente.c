@@ -94,6 +94,28 @@ npLED_t leds[LED_COUNT];
 PIO np_pio;
 uint sm;
 
+// --- FUNÇÕES PARA LEDS NEOPIXEL ---
+void npInit(uint pin) {
+    uint offset = pio_add_program(pio0, &ws2818b_program);
+    np_pio = pio0;
+    sm = pio_claim_unused_sm(np_pio, false);
+    if (sm < 0) {
+        np_pio = pio1;
+        sm = pio_claim_unused_sm(np_pio, true);
+    }
+    ws2818b_program_init(np_pio, sm, offset, pin, 800000.f);
+    for (uint i = 0; i < LED_COUNT; ++i) leds[i] = (npLED_t){0, 0, 0};
+}
+
+void npWrite() {
+    for (uint i = 0; i < LED_COUNT; ++i) {
+        pio_sm_put_blocking(np_pio, sm, leds[i].G);
+        pio_sm_put_blocking(np_pio, sm, leds[i].R);
+        pio_sm_put_blocking(np_pio, sm, leds[i].B);
+    }
+    sleep_us(100);
+}
+
 
 
 
