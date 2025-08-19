@@ -201,6 +201,80 @@ void salvar_historico_sensores() {
            t.day, t.month, t.hour, t.min, t.sec, temperatura_sensor, umidade_sensor);
 }
 
+// --- FUNÇÕES DE INTERFACE (DISPLAY E WEB) ---
+void atualizar_display_oled() {
+    char text[32];
+    memset(oled_buffer, 0, sizeof(oled_buffer));
+
+    sprintf(text, "Temp: %.1f C", temperatura_sensor);
+    ssd1306_draw_string(oled_buffer, 0, 0, text);
+
+    sprintf(text, "Umid: %.1f %%", umidade_sensor);
+    ssd1306_draw_string(oled_buffer, 0, 10, text);
+
+    sprintf(text, "Luz:    %s", gpio_get(RELAY_LIGHTS_PIN) ? "Ligada" : "Desligada");
+    ssd1306_draw_string(oled_buffer, 0, 20, text);
+    
+    sprintf(text, "Vent:   %s", gpio_get(RELAY_FAN_PIN) ? "Ligado" : "Desligado");
+    ssd1306_draw_string(oled_buffer, 0, 30, text);
+
+    sprintf(text, "Umidif: %s", gpio_get(RELAY_HUMIDIFIER_PIN) ? "Ligado" : "Desligado");
+    ssd1306_draw_string(oled_buffer, 0, 40, text);
+
+    sprintf(text, "%s", (cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA) == CYW43_LINK_UP) ? "WiFi: Conectado" : "WiFi: Desconectado");
+    ssd1306_draw_string(oled_buffer, 0, 54, text);
+
+    render_on_display(oled_buffer, &frame_area);
+}
+
+void create_http_response() {
+    char history_table_rows[2048] = "";
+    char *ptr = history_table_rows;
+    for (int i = 0; i < MAX_HISTORICO; i++) {
+        if (historico_valido[i]) {
+            ptr += sprintf(ptr, "<tr><td>%02d/%02d/%04d %02d:%02d:%02d</td><td>%.1f &deg;C</td><td>%.1f %%</td></tr>",
+                           historico_sensores[i].timestamp.day, historico_sensores[i].timestamp.month, historico_sensores[i].timestamp.year,
+                           historico_sensores[i].timestamp.hour, historico_sensores[i].timestamp.min, historico_sensores[i].timestamp.sec,
+                           historico_sensores[i].temperatura, historico_sensores[i].umidade);
+        }
+    }
+
+    const char *light_status = gpio_get(RELAY_LIGHTS_PIN) ? "Ligadas" : "Desligadas";
+    const char *fan_status = gpio_get(RELAY_FAN_PIN) ? "Ligado" : "Desligado";
+    const char *humidifier_status = gpio_get(RELAY_HUMIDIFIER_PIN) ? "Ligado" : "Desligado";
+
+    snprintf(http_response, sizeof(http_response),
+             "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n"
+             "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Pico W Home Control</title><meta http-equiv=\"refresh\" content=\"10\">"
+             "<style>body{font-family:sans-serif;background:#f4f4f4;color:#333;}.container{max-width:800px;margin:auto;padding:20px;background:#fff;"
+             "border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}table{width:100%%;border-collapse:collapse;margin-bottom:20px;}th,td{padding:12px;"
+             "text-align:left;border-bottom:1px solid #ddd;}th{background-color:#007bff;color:white;}h1,h2{color:#007bff;}a.button{display:inline-block;"
+             "padding:10px 15px;background-color:#28a745;color:white;text-decoration:none;border-radius:5px;}</style></head><body><div class=\"container\">"
+             "<h1>Painel de Controle - Pico W</h1><h2>Status Atual</h2><table><tr><th>Sensor/Atuador</th><th>Valor/Estado</th></tr>"
+             "<tr><td>Temperatura</td><td>%.1f &deg;C</td></tr><tr><td>Umidade</td><td>%.1f %%</td></tr><tr><td>Luminosidade</td><td>%.1f %%</td></tr>"
+             "<tr><td>Luzes</td><td>%s</td></tr><tr><td>Ventilador</td><td>%s</td></tr><tr><td>Umidificador</td><td>%s</td></tr></table>"
+             "<h2>Histórico Recente dos Sensores</h2><p><a href=\"/download\" class=\"button\">Baixar Histórico (CSV)</a></p>"
+             "<table><tr><th>Data e Hora</th><th>Temperatura</th><th>Umidade</th></tr>%s</table></div></body></html>\r\n",
+             temperatura_sensor, umidade_sensor, luminosidade_sensor, light_status, fan_status, humidifier_status, history_table_rows);
+}
+
+void create_csv_content() {
+    char *ptr = csv_content;
+    *ptr = '\0';
+    datetime_t t;
+    rtc_get_datetime(&t);
+    ptr += sprintf(ptr, "# Relatório de Histórico dos Sensores - Pico W\n");
+    ptr += sprintf(ptr, "# Gerado em: %04d-%02d-%02d %02d:%02d:%02d\n\n", t.year, t.month, t.day, t.hour, t.min, t.sec);
+    ptr += sprintf(ptr, "Timestamp;Temperatura (C);Umidade (%%)\n");
+    for (int i = 0; i < MAX_HISTORICO; i++) {
+        if (historico_valido[i]) {
+            ptr += sprintf(ptr, "%04d-%02d-%02d %02d:%02d:%02d;%.1f;%.1f\n",
+                           historico_sensores[i].timestamp.year, historico_sensores[i].timestamp.month, historico_sensores[i].timestamp.day,
+                           historico_sensores[i].timestamp.hour, historico_sensores[i].timestamp.min, historico_sensores[i].timestamp.sec,
+                           historico_sensores[i].temperatura, historico_sensores[i].umidade);
+        }
+    }
+}
 
 
 
