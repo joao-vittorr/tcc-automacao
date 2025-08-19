@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(automacao-pecuaria-ambiente automacao-pecuaria-ambiente.c )
+add_executable(automacao-pecuaria-ambiente automacao-pecuaria-ambiente.c inc/ssd1306_i2c.c)
 
 pico_set_program_name(automacao-pecuaria-ambiente "automacao-pecuaria-ambiente")
 pico_set_program_version(automacao-pecuaria-ambiente "0.1")
@@ -46,7 +46,18 @@ pico_enable_stdio_usb(automacao-pecuaria-ambiente 0)
 
 # Add the standard library to the build
 target_link_libraries(automacao-pecuaria-ambiente
-        pico_stdlib)
+        pico_stdlib
+        pico_cyw43_arch_none
+        hardware_i2c
+        hardware_adc
+        hardware_pwm
+        hardware_clocks
+        pico_cyw43_arch_lwip_threadsafe_background
+        pico_cyw43_arch
+        hardware_pio
+        hardware_rtc
+        pico_multicore
+        pico_sync)
 
 # Add the standard include files to the build
 target_include_directories(automacao-pecuaria-ambiente PRIVATE
