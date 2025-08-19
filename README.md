@@ -54,19 +54,6 @@ Uma interface web simples e objetiva foi desenvolvida para rodar localmente no m
 <img src="assets/Print_interface_web.png" alt="Dashboard de Monitoramento" width="600"/>
 Figura: Interface web para visualização dos dados.
 
-## 🛠️ Tecnologias Utilizadas
-
-### Hardware
--   Microcontrolador: **Raspberry Pi Pico W**
--   Sensores: **DHT11** (Temperatura e Umidade) e **Módulo LDR** (Luminosidade)
--   Atuadores: **Módulos Relé 5V**
--   Display: **OLED 128x64 I2C**
--   Alimentação: Fonte 5V, Bateria 18650 com Módulo Carregador BMS
-
-### Software e Linguagem
--   Linguagem de Programação: **C**
--   Ambiente de Desenvolvimento: **Visual Studio Code**
-
 ## 🚀 Simulação e Demonstração
 
 Para visualizar o funcionamento do protótipo, você pode acessar as simulações online nos links abaixo.
@@ -84,7 +71,7 @@ O projeto está organizado da seguinte forma:
 -   **/docs**: Contém a documentação escrita, incluindo o PDF final do TCC e a apresentação.
 -   **/data**: Armazena os dados brutos e resultados da pesquisa de campo realizada com os produtores.
 -   **/hardware**: Inclui os diagramas do circuito, a arquitetura da solução e fotos dos componentes utilizados.
--   **/src**: Contém todo o código-fonte em C desenvolvido para o Raspberry Pi Pico W.
+-   **/src**: Contém todo o código-fonte em C desenvolvido para o Raspberry Pi Pico W, na qual foi usado dados simulados para realizar a apresentação. Devido a falta de sensores por se tratar apenas de um protótipo inicial.
 -   **/assets**: Imagens utilizados neste README.
 
 ## ✨ Resultados
