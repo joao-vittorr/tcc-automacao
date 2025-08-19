@@ -122,6 +122,30 @@ const pixel_t COR_LUZ = {30, 100, 0};       // Amarelo (G, R, B)
 const pixel_t COR_VENTILADOR = {50, 50, 50}; // Branco
 const pixel_t COR_UMIDIFICADOR = {50, 0, 50};  // Ciano/Azul
 
+// Função para atualizar a matriz de LEDs com base no estado dos relés
+// Lógica usa LINHAS como indicadores.
+void atualizar_matriz_leds() {
+    bool luz_ligada = gpio_get(RELAY_LIGHTS_PIN);
+    bool ventilador_ligado = gpio_get(RELAY_FAN_PIN);
+    bool umidificador_ligado = gpio_get(RELAY_HUMIDIFIER_PIN);
+
+    for (int y = 0; y < 5; y++) {
+        for (int x = 0; x < 5; x++) {
+            int led_index = y * 5 + x;
+            
+            if (y == 0) { // Linha 1 (1x5) para o Ventilador
+                leds[led_index] = ventilador_ligado ? COR_VENTILADOR : COR_DESLIGADO;
+            } else if (y == 1) { // Linha 2 (1x5) para o Umidificador
+                leds[led_index] = umidificador_ligado ? COR_UMIDIFICADOR : COR_DESLIGADO;
+            } else if (y == 2) { // Linha 3 (1x5) para as Luzes
+                leds[led_index] = luz_ligada ? COR_LUZ : COR_DESLIGADO;
+            } else { // Linhas restantes (y=3 e y=4) ficam desligadas
+                leds[led_index] = COR_DESLIGADO;
+            }
+        }
+    }
+}
+
 
 int main()
 {
