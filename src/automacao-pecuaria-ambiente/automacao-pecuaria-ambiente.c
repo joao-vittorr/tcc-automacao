@@ -276,7 +276,51 @@ void create_csv_content() {
     }
 }
 
+// --- FUNÇÕES DE SERVIDOR WEB (LWIP) ---
+static err_t http_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err) {
+    if (p == NULL) {
+        tcp_close(tpcb);
+        return ERR_OK;
+    }
+    char *request = (char *)p->payload;
+    if (strstr(request, "GET /download")) {
+        create_csv_content();
+        snprintf(http_response, sizeof(http_response),
+                 "HTTP/1.1 200 OK\r\nContent-Disposition: attachment; filename=\"historico_sensores.csv\"\r\nContent-Type: text/csv\r\n"
+                 "Content-Length: %d\r\n\r\n%s", strlen(csv_content), csv_content);
+        tcp_write(tpcb, http_response, strlen(http_response), TCP_WRITE_FLAG_COPY);
+    } else {
+        create_http_response();
+        tcp_write(tpcb, http_response, strlen(http_response), TCP_WRITE_FLAG_COPY);
+    }
+    pbuf_free(p);
+    return ERR_OK;
+}
 
+static err_t connection_callback(void *arg, struct tcp_pcb *newpcb, err_t err) {
+    tcp_recv(newpcb, http_callback);
+    return ERR_OK;
+}
+
+static void start_http_server(void) {
+    struct tcp_pcb *pcb = tcp_new();
+    tcp_bind(pcb, IP_ADDR_ANY, 80);
+    pcb = tcp_listen(pcb);
+    tcp_accept(pcb, connection_callback);
+    printf("Servidor HTTP rodando na porta 80...\n");
+}
+
+void verificar_wifi() {
+    static absolute_time_t ultima_tentativa = {0};
+    if (cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA) != CYW43_LINK_UP) {
+        absolute_time_t agora = get_absolute_time();
+        if (absolute_time_diff_us(ultima_tentativa, agora) > 10 * 1000 * 1000) {
+            printf("Tentando reconectar ao Wi-Fi...\n");
+            ultima_tentativa = agora;
+            cyw43_arch_wifi_connect_async(WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_AES_PSK);
+        }
+    }
+}
 
 int main()
 {
