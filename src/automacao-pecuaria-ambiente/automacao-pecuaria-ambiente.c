@@ -77,6 +77,14 @@ typedef struct {
 historico_t historico_sensores[MAX_HISTORICO];
 bool historico_valido[MAX_HISTORICO];
 
+// Buffers para Webserver e OLED
+char http_response[4096];
+char csv_content[2048];
+uint8_t oled_buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
+struct render_area frame_area;
+
+
+
 
 int main()
 {
