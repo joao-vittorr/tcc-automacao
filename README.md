@@ -71,7 +71,7 @@ O projeto está organizado da seguinte forma:
 -   **/docs**: Contém a documentação escrita, incluindo o PDF final do TCC e a apresentação.
 -   **/data**: Armazena os dados brutos e resultados da pesquisa de campo realizada com os produtores.
 -   **/hardware**: Inclui os diagramas do circuito, a arquitetura da solução e fotos dos componentes utilizados.
--   **/src**: Contém todo o código-fonte em C desenvolvido para o Raspberry Pi Pico W.
+-   **/src**: Contém todo o código-fonte em C desenvolvido para o Raspberry Pi Pico W, na qual foi usado dados simulados para realizar a apresentação. Devido a falta de sensores por se tratar apenas de um protótipo inicial.
 -   **/assets**: Imagens utilizados neste README.
 
 ## ✨ Resultados
