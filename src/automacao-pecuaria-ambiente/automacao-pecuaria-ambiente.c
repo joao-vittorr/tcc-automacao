@@ -32,6 +32,34 @@
 #include "pico/util/datetime.h"
 #include "ws2818b.pio.h"
 
+// --- DEFINIÇÕES E CONSTANTES GLOBAIS ---
+// I2C para Display OLED
+const uint I2C_SDA = 14;
+const uint I2C_SCL = 15;
+#define SSD1306_WIDTH 128
+#define SSD1306_HEIGHT 64
+
+// Matriz de LEDs Neopixel (WS2812B)
+#define LED_COUNT 25
+#define LED_PIN_PIO 7
+
+// Credenciais Wi-Fi
+#define WIFI_SSID "S23"
+#define WIFI_PASS "#Vitor123@"
+
+// Pinos dos Relés
+#define RELAY_LIGHTS_PIN 26
+#define RELAY_FAN_PIN 27
+#define RELAY_HUMIDIFIER_PIN 28
+
+// Limiares de acionamento
+#define LUMINOSITY_THRESHOLD 40.0         // Acima deste valor, a luz apaga
+#define TEMPERATURE_FAN_THRESHOLD 28.0    // Acima deste valor, o ventilador liga
+#define HUMIDITY_HUMIDIFIER_THRESHOLD 45.0// Abaixo deste valor, o umidificador liga
+
+// Configuração do histórico
+#define MAX_HISTORICO 10
+const uint32_t SENSOR_READ_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
 
 
 int main()
