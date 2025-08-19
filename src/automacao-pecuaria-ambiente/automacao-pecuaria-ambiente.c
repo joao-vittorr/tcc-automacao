@@ -146,6 +146,63 @@ void atualizar_matriz_leds() {
     }
 }
 
+// --- FUNÇÕES DE SIMULAÇÃO E CONTROLE ---
+void simular_temperatura_umidade_sensor() {
+    temperatura_sensor = 20.0 + (rand() % 150) / 10.0;
+    umidade_sensor = 30.0 + (rand() % 600) / 10.0;
+    printf("Novos dados simulados: Temp=%.1f C, Umid=%.1f %%\n", temperatura_sensor, umidade_sensor);
+}
+
+void simular_luminosidade_sensor() {
+    luminosidade_sensor = rand() % 101;
+    printf("Nova luminosidade simulada: %.1f %%\n", luminosidade_sensor);
+}
+
+void acionar_rele_luz(bool ligar) {
+    if (ligar) {
+        if (!gpio_get(RELAY_LIGHTS_PIN)) printf("Luzes ligadas (luminosidade baixa).\n");
+        gpio_put(RELAY_LIGHTS_PIN, 1);
+    } else {
+        if (gpio_get(RELAY_LIGHTS_PIN)) printf("Luzes desligadas (luminosidade alta).\n");
+        gpio_put(RELAY_LIGHTS_PIN, 0);
+    }
+}
+
+void acionar_rele_ventilador(float temperatura) {
+    if (temperatura > TEMPERATURE_FAN_THRESHOLD) {
+        if (!gpio_get(RELAY_FAN_PIN)) printf("Ventilador ligado (temperatura alta: %.1f C).\n", temperatura);
+        gpio_put(RELAY_FAN_PIN, 1);
+    } else {
+        if (gpio_get(RELAY_FAN_PIN)) printf("Ventilador desligado (temperatura OK: %.1f C).\n", temperatura);
+        gpio_put(RELAY_FAN_PIN, 0);
+    }
+}
+
+void acionar_rele_umidificador(float umidade) {
+    if (umidade < HUMIDITY_HUMIDIFIER_THRESHOLD) {
+        if (!gpio_get(RELAY_HUMIDIFIER_PIN)) printf("Umidificador ligado (umidade baixa: %.1f %%).\n", umidade);
+        gpio_put(RELAY_HUMIDIFIER_PIN, 1);
+    } else {
+        if (gpio_get(RELAY_HUMIDIFIER_PIN)) printf("Umidificador desligado (umidade OK: %.1f %%).\n", umidade);
+        gpio_put(RELAY_HUMIDIFIER_PIN, 0);
+    }
+}
+
+void salvar_historico_sensores() {
+    datetime_t t;
+    rtc_get_datetime(&t);
+    for (int i = MAX_HISTORICO - 1; i > 0; i--) {
+        historico_sensores[i] = historico_sensores[i - 1];
+        historico_valido[i] = historico_valido[i - 1];
+    }
+    historico_sensores[0] = (historico_t){.temperatura = temperatura_sensor, .umidade = umidade_sensor, .timestamp = t};
+    historico_valido[0] = true;
+    printf("Novo registro salvo: %02d/%02d %02d:%02d:%02d - Temp=%.1f, Umid=%.1f\n",
+           t.day, t.month, t.hour, t.min, t.sec, temperatura_sensor, umidade_sensor);
+}
+
+
+
 
 int main()
 {
