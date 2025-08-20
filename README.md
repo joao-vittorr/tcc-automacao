@@ -58,7 +58,7 @@ Figura: Interface web para visualização dos dados.
 
 Para visualizar o funcionamento do protótipo, você pode acessar as simulações online nos links abaixo.
 
--   **Simulação Interativa no Wokwi:** [Acessar Simulação Wokwi](https://wokwi.com/projects/434689530805520385)
+-   **Simulação Interativa no Wokwi:** [Acessar Simulação Wokwi](https://wokwi.com/projects/434689530805520385) (Em micropython, devido a questões de compatiilidade e facilidade na plataforma). 
 -   **Site da Simulação:** [Acessar Simulação Web](https://simulacao-sistema-de-automacao-pecu.vercel.app/)
 
 <img src="assets/Ilustração_implantação_em_campo.png" alt="Demonstração da Arquitetura em Campo" width="600"/>
