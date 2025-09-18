@@ -20,6 +20,7 @@ Projeto de Trabalho de Conclusão de Curso (TCC) apresentado ao curso de Tecnól
 - [Simulação e Demonstração](#-simulação-e-demonstração)
 - [Estrutura do Repositório](#-estrutura-do-repositório)
 - [Resultados](#-resultados)
+- [Configuração do Ambiente](#-Configuração-do-Ambiente)
 - [Autor](#-autor)
 - [Licença](#-licença)
 
